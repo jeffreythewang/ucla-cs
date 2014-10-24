@@ -1,5 +1,5 @@
 # Fill in your name, student ID, and email address in this file.
-# If you are working in a team, fill out the information for both team 
+# If you are working in a team, fill out the information for both team
 # members.
 
 # SUBMIT THE LAB ONLY ONCE (from only one partner). This file will be
@@ -14,12 +14,10 @@
 
 # Partner 1
 Name: Matthew Goldberg
-Student ID: 704120793
 Email: mdgoldberg@ucla.edu
 
 # Partner 2 (if you're working in a team)
 Name: Jeffrey Wang
-Student ID: 104148158
 Email: jeffreywang93@gmail.com
 
 # EXERCISE 1: What method you used to make your peer download and upload

@@ -10,12 +10,10 @@
 
 # Partner 1
 Name: Matthew Goldberg
-Student ID: 704120793
 Email: mdgoldberg@ucla.edu
 
 # Partner 2
 Name: Jeffrey Wang
-Student ID: 104148158
 Email: jeffreywang93@gmail.com
 
 
