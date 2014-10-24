@@ -1,0 +1,107 @@
+# Fill in your name, student ID, and email address in this file.
+# If you are working in a team, fill out the information for both team 
+# members.
+
+# SUBMIT THE LAB ONLY ONCE (from only one partner). This file will be
+# automatically parsed in order to give both team members credit for the
+# lab.
+
+# You need to fill in the EXERCISE sections describing your solutions
+# for Tasks 1, 2, and 3, as well as write the corresponding code.
+# If you did one or more extra credit problems, indicate which one in the
+# appropriate section below (remove the # sign first). If you have any other
+# information you'd like us to know, please add it at the end of the file.
+
+# Partner 1
+Name: Matthew Goldberg
+Student ID: 704120793
+Email: mdgoldberg@ucla.edu
+
+# Partner 2 (if you're working in a team)
+Name: Jeffrey Wang
+Student ID: 104148158
+Email: jeffreywang93@gmail.com
+
+# EXERCISE 1: What method you used to make your peer download and upload
+#    files in parallel?  (~1-3 sentences)
+For both peer download and upload, we consecutively forked processes.
+For download, we had a variable to count the number of forked processes.
+We then reaped the dead processes with waitpid.
+For upload, we repeatedly forked and called waitpid with the WNOHANG flag to
+reap the dead processes from successful uploads.
+
+# EXERCISE 2A: What conditions did you find and fix that would have
+#    triggered a buffer overrun bug?  (~1-3 sentences each)
+Buffer overflow bugs existed in the calls to strcpy of osppeer.c.
+The bugs were that arguments provided, which were filenames, could cause buffer
+overflow if their length exceeded the maximum of the buffers they were copied into,
+given strcpy does not check bounds.
+In the task_download() and start_download() functions, we changed all strcpy
+calls to strncpy, specifying FILENAMESIZ as the amount of bytes to be copied.
+In the task_new() function, the change is redundant because a string literal is
+copied, but for sake of consistency, we decided to limit the size as well.
+
+In writescan.c, the function osp2p_writef() makes calls to strcpy. However,
+these calls will not trigger a buffer overrun bug because a call to ensure_buf
+grows the buffer so that the section does not overrrun the buffer when strcpy is
+called.
+
+# EXERCISE 2B: What other robustness problems did you fix?  (~1-3 sentences
+#    each)
+The popular tracker bug was fixed. The bug, which came from the task buffer size
+being insufficient to hold all of the info of peers from the popular tracker,
+was fixed by allowing the task buffer to dynamically resize with realloc when it
+filled up. The task struct therefore had its buffer changed to a pointer to a
+dynamic array of chars, with an int member recording buffer size.
+
+The specification that the peer should only serve files located in the current
+directory is already implemented because the program registers all files in the
+current directory for upload. The peer cannot specify which files to upload.
+The program also does not register files in subdirectories for upload.
+However, even with this feature implemented, we still performed a check in the
+task_upload() function to make sure that the file to be uploaded does not
+contain the '/' character.
+
+Another security feature we implemented was protection against attacks that
+involve file corruption, such as the bit-flipping attack (described below). For
+this, we implemented an MD5 checksum (further explained in the extra credit
+section).
+
+# EXERCISE 3: Describe the attacks you implemented for "evil mode".  Why
+#    are they attacks?  (~3-10 sentences each)
+The first attack we implemented was a BIT-FLIPPING attack. This is a type of
+file corruption attack. In task_upload(), when evil mode is activated, our
+program inverts all the bits of the file and serves it to other peers to
+download. This attack works because it retains the length of the file by
+looping from head to tail, ensuring that the right amount of bits are inverted.
+This is an attack because we can potentially tampler with sensitive information
+on a file.
+
+We also implemented a DENIAL OF SERVICE attack that causes our program to
+repeatedly send download requests to the same peer. In task_download(), when
+evil mode is activated, our program attempts to download from the same peer
+again after it successfully downloads from a peer. To ensure that we attack the
+same peer we downloaded from, our program does not run the code that moves to
+the next peer in the task_pop_peer function when evil mode is activated. This
+is an attack because it floods a peer with download requests, making its
+resources potentially unavailable to serve legitimate requests. The volume of
+requests can also lead to serve overload.
+
+# Extra credit problems
+Extra credit problem: File integrity via MD5 checksum
+
+Support for checking for file corruption using a MD5 checksums was added.
+First, when a peer is uploading their files, each respective file is used to
+generate the checksum based on the contents of the file. This mechanism is
+contained in the get_md5 function, which returns the checksum string.
+Peers then upload their files with the given checksum included by adding
+the string after the filename when using "HAVE" for the tracker.
+
+When a peer downloads a file, the download first completes, and then
+get_md5 returns a checksum of the downloaded file. This is compared with the
+tracker's checksum, which is obtained using writef to give the tracker a
+MD5SUM request and then snscanf to obtain the checksum string from the tracker
+response. If the tracker checksum and downloaded file's checksum differ, a
+message reports the difference and that corruption has likely occured.
+
+# Add any other information you'd like us to know below this line.

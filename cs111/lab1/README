@@ -1,0 +1,9 @@
+CS 111 Lab 1
+Professor Eggert
+Spring 2014
+
+Matthew Goldberg 704-120-793
+Jeffrey Wang 104-148-158
+
+Current limitations:
+- Possible bugs in subshell cases, particularly redirects. Exhaustive bug testing ytbd.
